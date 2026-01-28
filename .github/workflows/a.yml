@@ -1,0 +1,47 @@
+name: CI - Build Verification
+
+# This workflow triggers on:
+# - Every push to any branch
+# - Every pull request to any branch
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+      # 1. Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      # 2. Set up Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+      
+      # 3. Install dependencies
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm ci
+      
+      # 4. Run build
+      - name: Build project
+        working-directory: ./client
+        run: npm run build
+      
+      # 5. Optional: Run tests (if available)
+      - name: Run tests
+        working-directory: ./client
+        run: npm test -- --run
+        continue-on-error: true
