@@ -6,7 +6,7 @@ import { jest } from '@jest/globals';
 describe('User Model Test', () => {
   it('should hash the password before saving', async () => {
     const user = new User({
-      fullName: 'Test User',
+      fullName: 'Jeet267',
       email: 'test@example.com',
       password: 'password123',
     });
@@ -20,7 +20,7 @@ describe('User Model Test', () => {
 
   it('should correctly match passwords', async () => {
     const user = new User({
-      fullName: 'Test User',
+      fullName: 'Jeet267',
       email: 'test@example.com',
       password: 'hashed_password_stub',
     });
