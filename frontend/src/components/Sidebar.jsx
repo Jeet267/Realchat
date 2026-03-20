@@ -1,6 +1,6 @@
-import { Link, useLocation } from "react-router";
-import useAuthUser from "../hooks/useAuthUser";
-import { BellIcon, HomeIcon, ShipWheelIcon, UsersIcon } from "lucide-react";
+import { Link, useLocation } from 'react-router';
+import useAuthUser from '../hooks/useAuthUser';
+import { BellIcon, HomeIcon, ShipWheelIcon, UsersIcon } from 'lucide-react';
 
 const Sidebar = () => {
   const { authUser } = useAuthUser();
@@ -22,7 +22,7 @@ const Sidebar = () => {
         <Link
           to="/"
           className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
-            currentPath === "/" ? "btn-active" : ""
+            currentPath === '/' ? 'btn-active' : ''
           }`}
         >
           <HomeIcon className="size-5 text-base-content opacity-70" />
@@ -32,7 +32,7 @@ const Sidebar = () => {
         <Link
           to="/friends"
           className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
-            currentPath === "/friends" ? "btn-active" : ""
+            currentPath === '/friends' ? 'btn-active' : ''
           }`}
         >
           <UsersIcon className="size-5 text-base-content opacity-70" />
@@ -42,7 +42,7 @@ const Sidebar = () => {
         <Link
           to="/notifications"
           className={`btn btn-ghost justify-start w-full gap-3 px-3 normal-case ${
-            currentPath === "/notifications" ? "btn-active" : ""
+            currentPath === '/notifications' ? 'btn-active' : ''
           }`}
         >
           <BellIcon className="size-5 text-base-content opacity-70" />
