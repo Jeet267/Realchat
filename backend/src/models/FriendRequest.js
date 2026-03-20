@@ -1,21 +1,21 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const friendRequestSchema = new mongoose.Schema(
   {
     sender: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     recipient: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
     status: {
       type: String,
-      enum: ["pending", "accepted"],
-      default: "pending",
+      enum: ['pending', 'accepted'],
+      default: 'pending',
     },
   },
   {
@@ -23,6 +23,6 @@ const friendRequestSchema = new mongoose.Schema(
   }
 );
 
-const FriendRequest = mongoose.model("FriendRequest", friendRequestSchema);
+const FriendRequest = mongoose.model('FriendRequest', friendRequestSchema);
 
 export default FriendRequest;

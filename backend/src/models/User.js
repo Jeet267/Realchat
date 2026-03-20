@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema(
   {
@@ -19,23 +19,23 @@ const userSchema = new mongoose.Schema(
     },
     bio: {
       type: String,
-      default: "",
+      default: '',
     },
     profilePic: {
       type: String,
-      default: "",
+      default: '',
     },
     nativeLanguage: {
       type: String,
-      default: "",
+      default: '',
     },
     learningLanguage: {
       type: String,
-      default: "",
+      default: '',
     },
     location: {
       type: String,
-      default: "",
+      default: '',
     },
     isOnboarded: {
       type: Boolean,
@@ -44,15 +44,15 @@ const userSchema = new mongoose.Schema(
     friends: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: 'User',
       },
     ],
   },
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
 
   try {
     const salt = await bcrypt.genSalt(10);
@@ -64,10 +64,13 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.matchPassword = async function (enteredPassword) {
-  const isPasswordCorrect = await bcrypt.compare(enteredPassword, this.password);
+  const isPasswordCorrect = await bcrypt.compare(
+    enteredPassword,
+    this.password
+  );
   return isPasswordCorrect;
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
 
 export default User;

@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router";
-import useAuthUser from "../hooks/useAuthUser";
-import { useQuery } from "@tanstack/react-query";
-import { getStreamToken } from "../lib/api";
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
+import useAuthUser from '../hooks/useAuthUser';
+import { useQuery } from '@tanstack/react-query';
+import { getStreamToken } from '../lib/api';
 
 import {
   StreamVideo,
@@ -13,11 +13,11 @@ import {
   StreamTheme,
   CallingState,
   useCallStateHooks,
-} from "@stream-io/video-react-sdk";
+} from '@stream-io/video-react-sdk';
 
-import "@stream-io/video-react-sdk/dist/css/styles.css";
-import toast from "react-hot-toast";
-import PageLoader from "../components/PageLoader";
+import '@stream-io/video-react-sdk/dist/css/styles.css';
+import toast from 'react-hot-toast';
+import PageLoader from '../components/PageLoader';
 
 const STREAM_API_KEY = import.meta.env.VITE_STREAM_API_KEY;
 
@@ -30,7 +30,7 @@ const CallPage = () => {
   const { authUser, isLoading } = useAuthUser();
 
   const { data: tokenData } = useQuery({
-    queryKey: ["streamToken"],
+    queryKey: ['streamToken'],
     queryFn: getStreamToken,
     enabled: !!authUser,
   });
@@ -40,7 +40,7 @@ const CallPage = () => {
       if (!tokenData.token || !authUser || !callId) return;
 
       try {
-        console.log("Initializing Stream video client...");
+        console.log('Initializing Stream video client...');
 
         const user = {
           id: authUser._id,
@@ -54,17 +54,17 @@ const CallPage = () => {
           token: tokenData.token,
         });
 
-        const callInstance = videoClient.call("default", callId);
+        const callInstance = videoClient.call('default', callId);
 
         await callInstance.join({ create: true });
 
-        console.log("Joined call successfully");
+        console.log('Joined call successfully');
 
         setClient(videoClient);
         setCall(callInstance);
       } catch (error) {
-        console.error("Error joining call:", error);
-        toast.error("Could not join the call. Please try again.");
+        console.error('Error joining call:', error);
+        toast.error('Could not join the call. Please try again.');
       } finally {
         setIsConnecting(false);
       }
@@ -100,7 +100,7 @@ const CallContent = () => {
 
   const navigate = useNavigate();
 
-  if (callingState === CallingState.LEFT) return navigate("/");
+  if (callingState === CallingState.LEFT) return navigate('/');
 
   return (
     <StreamTheme>
