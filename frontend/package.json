@@ -10,6 +10,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "e2e": "cypress run",
     "preview": "vite preview"
   },
   "dependencies": {

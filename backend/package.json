@@ -7,7 +7,7 @@
     "start": "node src/server.js",
     "lint": "eslint . --fix",
     "format": "prettier --write .",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
+    "test": "NODE_ENV=test NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "keywords": [],
   "author": "",
