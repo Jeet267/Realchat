@@ -115,7 +115,8 @@ jobs:
         id: image_tag
         run: |
           SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
-          ECR_URL="${{ needs.terraform.outputs.ecr_url }}"
+          ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+          ECR_URL="${ACCOUNT_ID}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/realchat-prod"
           echo "tag=${ECR_URL}:${SHORT_SHA}"   >> "$GITHUB_OUTPUT"
           echo "latest=${ECR_URL}:latest"      >> "$GITHUB_OUTPUT"
 
@@ -138,8 +139,8 @@ jobs:
         run: |
           # Fetch current task definition
           TASK_DEF_ARN=$(aws ecs describe-services \
-            --cluster "${{ needs.terraform.outputs.ecs_cluster }}" \
-            --services "${{ needs.terraform.outputs.ecs_service }}" \
+            --cluster "realchat-prod-cluster" \
+            --services "realchat-prod-service" \
             --query 'services[0].taskDefinition' \
             --output text)
 
@@ -162,8 +163,8 @@ jobs:
 
           # Update the ECS service to use the new revision
           aws ecs update-service \
-            --cluster "${{ needs.terraform.outputs.ecs_cluster }}" \
-            --service "${{ needs.terraform.outputs.ecs_service }}" \
+            --cluster "realchat-prod-cluster" \
+            --service "realchat-prod-service" \
             --task-definition "$NEW_TASK_ARN" \
             --force-new-deployment
 
@@ -172,16 +173,16 @@ jobs:
         run: |
           echo "Waiting for ECS service to reach steady state…"
           aws ecs wait services-stable \
-            --cluster "${{ needs.terraform.outputs.ecs_cluster }}" \
-            --services "${{ needs.terraform.outputs.ecs_service }}"
+            --cluster "realchat-prod-cluster" \
+            --services "realchat-prod-service"
           echo "✅ ECS service is running and stable."
 
       # ── Verify at least one task is RUNNING ───────────────
       - name: Verify running tasks
         run: |
           RUNNING=$(aws ecs describe-services \
-            --cluster "${{ needs.terraform.outputs.ecs_cluster }}" \
-            --services "${{ needs.terraform.outputs.ecs_service }}" \
+            --cluster "realchat-prod-cluster" \
+            --services "realchat-prod-service" \
             --query 'services[0].runningCount' \
             --output text)
 
