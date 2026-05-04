@@ -49,6 +49,21 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
+      - name: Import Existing Resources (State Recovery)
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        continue-on-error: true
+        run: |
+          # The AWS Academy environment does not easily support S3 backend state.
+          # If a previous run failed, resources may already exist. Import them to avoid AlreadyExists errors.
+          terraform import aws_ecr_repository.app_repo realchat-prod || true
+          terraform import aws_cloudwatch_log_group.app_logs /ecs/realchat-prod || true
+          
+          # Find and import Security Group if it exists
+          SG_ID=$(aws ec2 describe-security-groups --filters Name=group-name,Values=realchat-ecs-sg --query "SecurityGroups[0].GroupId" --output text || echo "None")
+          if [ "$SG_ID" != "None" ] && [ -n "$SG_ID" ]; then
+            terraform import aws_security_group.ecs_sg $SG_ID || true
+          fi
+
       - name: Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
