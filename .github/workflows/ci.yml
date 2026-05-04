@@ -1,4 +1,4 @@
-name: CI - Build & Test
+name: CI — Phase 1 Testing
 
 on:
   push:
@@ -7,56 +7,94 @@ on:
     branches: ['**']
 
 jobs:
-  backend:
+  # ─────────────────────────────────────────────
+  # Backend — Unit & Integration Tests (Jest)
+  # ─────────────────────────────────────────────
+  backend-tests:
+    name: Backend Tests (Jest)
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install backend dependencies
         working-directory: ./backend
         run: npm ci
 
-      - name: Run Linter
+      - name: Run ESLint
         working-directory: ./backend
         run: npm run lint
 
-      - name: Run Tests
+      - name: Run unit & integration tests with JUnit reporter
         working-directory: ./backend
-        run: npm test
+        env:
+          NODE_ENV: test
+          JEST_JUNIT_OUTPUT_DIR: ./test-results
+          JEST_JUNIT_OUTPUT_NAME: backend-junit.xml
+        run: |
+          # Create output dir and a minimal .env.test so dotenv doesn't fail
+          mkdir -p test-results
+          echo "NODE_ENV=test" > .env.test
+          NODE_OPTIONS=--experimental-vm-modules npx jest \
+            --reporters=default \
+            --reporters=jest-junit \
+            --forceExit \
+            --ci
 
-  frontend:
+      - name: Upload backend test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-report
+          path: backend/test-results/backend-junit.xml
+          retention-days: 14
+
+  # ─────────────────────────────────────────────
+  # Frontend — Unit Tests (Vitest)
+  # ─────────────────────────────────────────────
+  frontend-tests:
+    name: Frontend Tests (Vitest)
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20.x
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install frontend dependencies
         working-directory: ./frontend
         run: npm ci
 
-      - name: Run Linter
+      - name: Run ESLint
         working-directory: ./frontend
         run: npm run lint
 
-      - name: Run Tests
+      - name: Run unit tests with JUnit reporter
         working-directory: ./frontend
         run: npm test
 
-      - name: Build project
+      - name: Upload frontend test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-test-report
+          path: frontend/test-results/frontend-junit.xml
+          retention-days: 14
+
+      - name: Build frontend (smoke check)
         working-directory: ./frontend
         run: npm run build

@@ -8,5 +8,10 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './src/setupTests.js',
+    // JUnit XML reporter — consumed by GitHub Actions artifact upload (Phase 1)
+    reporters: ['default', 'junit'],
+    outputFile: {
+      junit: './test-results/frontend-junit.xml',
+    },
   },
 });

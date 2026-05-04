@@ -25,6 +25,9 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+// Health check — used by Docker HEALTHCHECK and ECS
+app.get('/api/health', (_req, res) => res.status(200).json({ status: 'ok' }));
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
