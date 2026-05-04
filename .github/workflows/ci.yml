@@ -29,6 +29,10 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
+      - name: Install jest-junit reporter
+        working-directory: ./backend
+        run: npm install --no-save jest-junit
+
       - name: Run ESLint
         working-directory: ./backend
         run: npm run lint
