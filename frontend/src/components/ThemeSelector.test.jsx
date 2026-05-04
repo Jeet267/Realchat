@@ -39,7 +39,7 @@ describe('ThemeSelector', () => {
     render(<ThemeSelector />);
     const lightOption = screen.getByText('Light');
     const darkOption = screen.getByText('Dark');
-    
+
     expect(lightOption).toBeInTheDocument();
     expect(darkOption).toBeInTheDocument();
   });
