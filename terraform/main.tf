@@ -160,12 +160,14 @@ resource "aws_ecs_task_definition" "app_task" {
     }]
 
     environment = [
-      { name = "NODE_ENV", value = var.environment },
-      { name = "PORT",     value = tostring(var.app_port) }
+      { name = "NODE_ENV",       value = var.environment },
+      { name = "PORT",           value = tostring(var.app_port) },
+      { name = "MONGO_URI",      value = var.mongo_uri },
+      { name = "JWT_SECRET_KEY", value = var.jwt_secret_key }
     ]
 
     healthCheck = {
-      command     = ["CMD-SHELL", "curl -f http://localhost:${var.app_port}/api/health || exit 1"]
+      command     = ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:${var.app_port}/api/health || exit 1"]
       interval    = 30
       timeout     = 5
       retries     = 3

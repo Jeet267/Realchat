@@ -81,6 +81,8 @@ jobs:
         run: |
           terraform plan \
             -var="aws_region=${{ secrets.AWS_REGION }}" \
+            -var="mongo_uri=${{ secrets.MONGO_URI }}" \
+            -var="jwt_secret_key=${{ secrets.JWT_SECRET_KEY }}" \
             -out=tfplan
 
       - name: Terraform Apply

@@ -39,3 +39,15 @@ variable "desired_count" {
   type        = number
   default     = 1
 }
+
+variable "mongo_uri" {
+  description = "MongoDB connection string"
+  type        = string
+  sensitive   = true
+}
+
+variable "jwt_secret_key" {
+  description = "JWT Secret Key"
+  type        = string
+  sensitive   = true
+}
