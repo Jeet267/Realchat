@@ -41,6 +41,16 @@ jobs:
           terraform_version: "~1.9"
           terraform_wrapper: false
 
+      # ── Cache Terraform State ─────────────────────────────
+      - name: Cache Terraform State
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.TF_WORKING_DIR }}/terraform.tfstate
+          key: terraform-state-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            terraform-state-${{ github.ref }}-
+            terraform-state-
+
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform init
