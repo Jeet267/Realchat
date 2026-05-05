@@ -38,7 +38,7 @@ RUN npm ci --omit=dev && npm cache clean --force
 COPY --from=builder /app/backend/src ./src
 
 # Copy built frontend assets served by Express in production
-COPY --from=builder /app/frontend/dist ../frontend/dist
+COPY --from=builder /app/frontend/dist ./frontend/dist
 
 # ── Security: run as non-root user ────────────────────────
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
