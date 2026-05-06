@@ -22,3 +22,8 @@ output "ecs_service_name" {
   description = "Name of the ECS Fargate service"
   value       = aws_ecs_service.app_service.name
 }
+
+output "alb_dns_name" {
+  description = "The DNS name of the Application Load Balancer"
+  value       = aws_lb.app_alb.dns_name
+}
