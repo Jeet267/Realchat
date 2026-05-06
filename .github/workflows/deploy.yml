@@ -53,18 +53,31 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         continue-on-error: true
         run: |
-          # Import resources if they already exist to sync with the new S3 backend
+          # 1. FIND THE EXISTING BUCKET NAME AUTOMATICALLY
+          EXISTING_BUCKET=$(aws s3 ls | grep "realchat-prod-" | awk '{print $3}' | head -n 1 || echo "None")
+          
+          if [ "$EXISTING_BUCKET" != "None" ] && [ -n "$EXISTING_BUCKET" ]; then
+            # Extract the hex suffix (the part after realchat-prod-)
+            HEX_SUFFIX=$(echo $EXISTING_BUCKET | sed 's/realchat-prod-//')
+            
+            echo "Found existing bucket: $EXISTING_BUCKET with suffix: $HEX_SUFFIX"
+            
+            # Import them into the new S3 state
+            terraform import random_id.bucket_suffix $HEX_SUFFIX || true
+            terraform import aws_s3_bucket.app_bucket $EXISTING_BUCKET || true
+          fi
+
+          # 2. IMPORT OTHER RESOURCES
           terraform import aws_ecr_repository.app_repo realchat-prod || true
           terraform import aws_cloudwatch_log_group.app_logs /ecs/realchat-prod || true
           terraform import aws_ecs_cluster.app_cluster realchat-prod-cluster || true
           
-          # Find and import Security Group if it exists
+          # Find and import Security Groups
           SG_ID=$(aws ec2 describe-security-groups --filters Name=group-name,Values=realchat-ecs-sg --query "SecurityGroups[0].GroupId" --output text || echo "None")
           if [ "$SG_ID" != "None" ] && [ -n "$SG_ID" ]; then
             terraform import aws_security_group.ecs_sg $SG_ID || true
           fi
 
-          # Import the ALB-related security group
           ALB_SG_ID=$(aws ec2 describe-security-groups --filters Name=group-name,Values=realchat-alb-sg --query "SecurityGroups[0].GroupId" --output text || echo "None")
           if [ "$ALB_SG_ID" != "None" ] && [ -n "$ALB_SG_ID" ]; then
             terraform import aws_security_group.alb_sg $ALB_SG_ID || true
