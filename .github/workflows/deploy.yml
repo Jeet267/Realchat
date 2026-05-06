@@ -49,6 +49,27 @@ jobs:
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: terraform validate
 
+      - name: Import Existing Resources (State Recovery)
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        continue-on-error: true
+        run: |
+          # Import resources if they already exist to sync with the new S3 backend
+          terraform import aws_ecr_repository.app_repo realchat-prod || true
+          terraform import aws_cloudwatch_log_group.app_logs /ecs/realchat-prod || true
+          terraform import aws_ecs_cluster.app_cluster realchat-prod-cluster || true
+          
+          # Find and import Security Group if it exists
+          SG_ID=$(aws ec2 describe-security-groups --filters Name=group-name,Values=realchat-ecs-sg --query "SecurityGroups[0].GroupId" --output text || echo "None")
+          if [ "$SG_ID" != "None" ] && [ -n "$SG_ID" ]; then
+            terraform import aws_security_group.ecs_sg $SG_ID || true
+          fi
+
+          # Import the ALB-related security group
+          ALB_SG_ID=$(aws ec2 describe-security-groups --filters Name=group-name,Values=realchat-alb-sg --query "SecurityGroups[0].GroupId" --output text || echo "None")
+          if [ "$ALB_SG_ID" != "None" ] && [ -n "$ALB_SG_ID" ]; then
+            terraform import aws_security_group.alb_sg $ALB_SG_ID || true
+          fi
+
       - name: Terraform Plan
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
